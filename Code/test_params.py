@@ -52,22 +52,22 @@ MASK_EXIST = 'Vessel'
 QSM_RES_GEN_TOGGLE = True
 RESULT_SAVE_TOGGLE = True
 
-TEST_PATH = './Data/'
+TEST_PATH = '../Data/'
 TEST_FILE = ['test_file.mat']
 
-CHECKPOINT_PATH = './Checkpoint/'
+CHECKPOINT_PATH = '../Checkpoint/'
 CHECKPOINT_FILE = 'xsepnet.pth.tar'
-VALUE_FILE_PATH = './Checkpoint/'
+VALUE_FILE_PATH = '../Checkpoint/'
 VALUE_FILE_NAME = 'xsepnet_norm_factor.mat'
 
-QSM_NET_CHECKPOINT_PATH = './Checkpoint/'
+QSM_NET_CHECKPOINT_PATH = '../Checkpoint/'
 QSM_NET_CHECKPOINT_FILE = 'QSMnet.pth.tar'
 QSM_NET_VALUE_FILE_PATH = './Checkpoint/'
 QSM_NET_VALUE_FILE_NAME = 'xsepnet_norm_factor.mat'
 
-R2P_NET_CHECKPOINT_PATH = './Checkpoint/'
+R2P_NET_CHECKPOINT_PATH = '../Checkpoint/'
 R2P_NET_CHECKPOINT_FILE = 'R2PRIMEnet.pth.tar'
-R2P_NET_VALUE_FILE_PATH = './Checkpoint/'
+R2P_NET_VALUE_FILE_PATH = '../Checkpoint/'
 R2P_NET_VALUE_FILE_NAME = 'xsepnet_norm_factor.mat'
 
 RESULT_PATH = CHECKPOINT_PATH + 'Results/'
