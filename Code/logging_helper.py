@@ -47,7 +47,6 @@ def _log_exception(exc_type, exc_value, exc_traceback):
 
 
 def setup(log_dir: str = None, filename: str = None):
-    print(log_dir)
     if log_dir is not None:
         if log_dir != "" and not os.path.exists(log_dir):
             os.makedirs(log_dir)
