@@ -11,11 +11,12 @@
 
 ⭐ If you only have GRE data, neural network (chi-sepnet-R2*) will deliver high quality susceptibility source-separated maps.
 
-⭐ Input data with the same orientation with trained data () is recommended.
-
 ⭐ If you acquired data with different resolution from 1 x 1 x 1 mm<sup>3</sup>, the resolution generalization method (can process resolution > 0.6 mm; check the reference) is required.
 
 ⭐ If you acquired data with different B<sub>0</sub> direction from [0, 0, 1], the B<sub>0</sub> direction correction to [0, 0, 1] is required.
+
+⭐ Input data with the same orientation with trained data (check the figure below) is recommended.
+![xsepnet_data_order](https://github.com/user-attachments/assets/a99aeefd-8e01-4810-80e7-c02b6130d5db)
 
 ## Inference
 You can follow the steps below for the inference.
@@ -36,7 +37,7 @@ You can follow the steps below for the inference.
     ```bash
     python test.py
     ```
-## Reference
+## References
 >M. Kim, S. Ji, J. Kim, K. Min, H. Jeong, J. Youn, T. Kim, J. Jang, B. Bilgic, H. Shin, J. Lee, $\chi$-sepnet: Deep neural network for magnetic susceptibility source separation, arXiv prepring, 2024
 
 >S. Ji, J. Park, H.-G. Shin, J. Youn, M. Kim and J. Lee, Successful generalization for data with higher or lower resolution than training data resolution in deep learning powered QSM reconstruction, ISMRM, 2023
