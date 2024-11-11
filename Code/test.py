@@ -8,7 +8,7 @@
 #  Seoul National University
 #  email : minjoony@snu.ac.kr
 #
-# Last update: 24.09.20
+# Last update: 24.11.11
 '''
 import os
 import logging
@@ -70,21 +70,14 @@ qsm_model = QSMnet(channel_in=args.CHANNEL_IN, kernel_size=args.KERNEL_SIZE).to(
 PRE_NET_WEIGHT_NAME = args.QSM_NET_CHECKPOINT_PATH + args.QSM_NET_CHECKPOINT_FILE
 PRE_NET_WEIGHT = torch.load(PRE_NET_WEIGHT_NAME)
 
-multi_gpu_used = 0
-new_state_dict = OrderedDict()
-for name in PRE_NET_WEIGHT['state_dict']:
-    if name[:6] != 'module':
-        break
-    else:
-        multi_gpu_used = 1
-        new_name = name[7:]
-        new_state_dict[new_name] = PRE_NET_WEIGHT['state_dict'][name]
+state_dict = PRE_NET_WEIGHT['state_dict']
+new_state_dict = {}
 
-if multi_gpu_used == 0:
-    qsm_model.load_state_dict(PRE_NET_WEIGHT['state_dict'])
-elif multi_gpu_used == 1:
-    logger.info(f'QSMnet: multi GPU were used')
-    qsm_model.load_state_dict(new_state_dict)
+for key in state_dict.keys():
+    new_key = key.replace('module.', '')
+    new_state_dict[new_key] = state_dict[key]
+
+qsm_model.load_state_dict(new_state_dict)
 
 ### xsepnet ###
 model = KAInet(channel_in=args.CHANNEL_IN, kernel_size=args.KERNEL_SIZE).to(device)
@@ -92,21 +85,14 @@ model = KAInet(channel_in=args.CHANNEL_IN, kernel_size=args.KERNEL_SIZE).to(devi
 load_file_name = args.CHECKPOINT_PATH + args.CHECKPOINT_FILE
 checkpoint = torch.load(load_file_name)
 
-multi_gpu_used = 0
-new_state_dict = OrderedDict()
-for name in checkpoint['state_dict']:    
-    if name[:6] != 'module':
-        break
-    else:
-        multi_gpu_used = 1
-        new_name = name[7:]
-        new_state_dict[new_name] = checkpoint['state_dict'][name]
+state_dict = checkpoint['state_dict']
+new_state_dict = {}
 
-if multi_gpu_used == 0:
-    model.load_state_dict(checkpoint['state_dict'])
-elif multi_gpu_used == 1:    
-    logger.info(f'x-sepnet: multi GPU were used')
-    model.load_state_dict(new_state_dict)
+for key in state_dict.keys():
+    new_key = key.replace('module.', '')
+    new_state_dict[new_key] = state_dict[key]
+
+model.load_state_dict(new_state_dict)
     
 ### R2PRIMEnet ###
 if args.INPUT_MAP == 'r2s':
