@@ -8,7 +8,7 @@
 #  Seoul National University
 #  email : minjoony@snu.ac.kr
 #
-# Last update: 24.09.20
+# Last update: 24.11.11
 '''
 import os
 import math
@@ -20,15 +20,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import random
+from random import sample
+import logging
+import logging_helper as logging_helper
+import time
+import datetime
 
 from math import log10, sqrt
 from numpy.fft import fftn, ifftn, fftshift
 from skimage.metrics import structural_similarity as ssim
-import pytorch_ssim
-
-import re
-import time
-from random import sample
 
         
 def set_global_mean_std(pos_mean, pos_std, neg_mean, neg_std):
@@ -41,12 +41,6 @@ def set_global_mean_std(pos_mean, pos_std, neg_mean, neg_std):
     GLOBAL_POS_STD = pos_std
     GLOBAL_NEG_MEAN = neg_mean
     GLOBAL_NEG_STD = neg_std
-    
-    
-def seed_worker(worker_id):
-    worker_seed = torch.initial_seed() % 2**32
-    np.random.seed(worker_seed)
-    random.seed(worker_seed)
     
     
 def Concat(x, y):
@@ -93,6 +87,66 @@ class Deconv3d(nn.Module):
     def forward(self,x):
         return self.deconv(x)
 
+
+def load_pretrained_state_dict(model: nn.Module, model_weights_path: str, logger):
+    checkpoint = torch.load(model_weights_path)
+    epoch = checkpoint["epoch"]
+
+    state_dict = checkpoint['state_dict']
+    new_state_dict = {}
+
+    for key in state_dict.keys():
+        new_key = key.replace('module.', '')
+        new_state_dict[new_key] = state_dict[key]
+
+    model.load_state_dict(new_state_dict)
+
+    return model, epoch
+
+
+def setting_logger(path, file_name, module_type):
+    if module_type == 'train':
+        logger = logging.getLogger("module.train")
+    elif module_type == 'test':
+        logger = logging.getLogger("module.test")
+        
+    logger.setLevel(logging.INFO)
+    logging_helper.setup(path, file_name)
+    
+    nowDate = datetime.datetime.now().strftime('%Y-%m-%d')
+    nowTime = datetime.datetime.now().strftime('%H:%M:%S')
+    logger.info(f'Date: {nowDate}  {nowTime}')
+
+    return logger
+
+
+def createDirectory(directory):
+    try:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+    except OSError:
+        print("Error: Failed to create the directory.")
+
+
+def setting_seed(seed):
+    os.environ['PYTHONHASHargs.seed'] = str(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.random.manual_seed(seed)
+    torch.backends.cudnn.deterministic=True # for reproducibility: True is recommended
+    torch.backends.cudnn.benchmark=False # for reproducibility: False is recommended
+    g = torch.Generator()
+    g.manual_seed(0)
+
+
+def seed_worker(worker_id):
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+        
 
 def dipole_kernel(matrix_size, voxel_size, B0_dir):
     """
@@ -370,14 +424,6 @@ def SSIM(im1, im2, mask):
         return np.mean(ssim_maps[mask])
     else:
         raise Exception('SSIM - input dimension error')    
-        
-
-def createDirectory(directory):
-    try:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-    except OSError:
-        print("Error: Failed to create the directory.")
     
     
 def crop_img_16x(img):
@@ -398,36 +444,6 @@ def crop_img_16x(img):
         img = img[:, :, int(residual/2):int(-(residual/2))]
         
     return img
-
-
-class LeakyReLU_custom(torch.autograd.Function):
-    @staticmethod
-    def forward(ctx, z):
-        ctx.save_for_backward(z)
-        
-        out = z.clone()
-        pos_mask = z[:, 0, :, :, :] <= -(GLOBAL_POS_MEAN/GLOBAL_POS_STD)
-        neg_mask = z[:, 1, :, :, :] <= -(GLOBAL_NEG_MEAN/GLOBAL_NEG_STD)
-        
-        out[:, 0][pos_mask] *= 0.001
-        out[:, 1][neg_mask] *= 0.001
-        
-        return out
-
-    @staticmethod
-    def backward(ctx, dout):
-        z, = ctx.saved_tensors
-        
-        backward_out_pos = z[:, 0, :, :, :]
-        backward_out_neg = z[:, 1, :, :, :]
-        
-        backward_out_pos[backward_out_pos > -(GLOBAL_POS_MEAN/GLOBAL_POS_STD)] = 1
-        backward_out_neg[backward_out_neg > -(GLOBAL_NEG_MEAN/GLOBAL_NEG_STD)] = 1
-        
-        backward_out_pos[backward_out_pos <= -(GLOBAL_POS_MEAN/GLOBAL_POS_STD)] = 0.001
-        backward_out_neg[backward_out_neg <= -(GLOBAL_NEG_MEAN/GLOBAL_NEG_STD)] = 0.001
-        
-        return torch.cat((torch.unsqueeze(dout[:, 0, :, :, :] * backward_out_pos, dim=1), torch.unsqueeze(dout[:, 1, :, :, :] * backward_out_neg, dim=1)), dim=1)
 
 
 class SSIM_cal_3D(nn.Module):
@@ -514,21 +530,3 @@ def calculate_ssim(img, ref, mask):
     elif len(img.shape) == 4:
         ssim = ssim_cal_2d(img, ref, ones)
     return ssim
-
-def calculate_psnr(img, ref, mask):
-    if mask != None:
-        mask = mask.to(img.device)
-        img = img * mask
-        ref = ref * mask
-    mse = F.mse_loss(img, ref, reduction="none")
-
-    if len(mse.shape) == 2 or len(mse.shape) == 3:
-        mse = mse.reshape(1, -1).mean(1)
-        ref_resize = ref.reshape(1, -1)
-        img_max,_ = torch.max(ref_resize,1)
-    else:
-        print('not implemented psnr')
-
-    psnr = 10 * torch.log10(img_max ** 2 / (mse + 1e-12))
-
-    return psnr

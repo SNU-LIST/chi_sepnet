@@ -112,7 +112,6 @@ def parse():
     parser.add_argument("--SEED", default=SEED)
     parser.add_argument("--INPUT_MAP", default=INPUT_MAP)
     parser.add_argument("--INPUT_UNIT", default=INPUT_UNIT)
-    parser.add_argument("--LEAKY_RELU_TOGGLE", default=LEAKY_RELU_TOGGLE)
     
     parser.add_argument("--TRAIN_PATH", default=TRAIN_PATH)
     parser.add_argument("--VALID_PATH", default=VALID_PATH)
