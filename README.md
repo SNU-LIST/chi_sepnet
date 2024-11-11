@@ -3,7 +3,7 @@
 * Matlab toolbox including conventional source separation method ($\chi$-separation) is also available (https://github.com/SNU-LIST/chi-separation.git).
 * The source data for training can be shared to academic institutions. Request should be sent to snu.list.software@gmail.com. For each request, internal approval from our Institutional Review Board (IRB) is required (i.e. takes time).
 * Don't hesitate to contact for usage and bugs: minjoony@snu.ac.kr
-* Last update : Sep 23, 2024
+* Last update : Nov 11, 2024
 
 
 ## Usage
