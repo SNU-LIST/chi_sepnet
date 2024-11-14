@@ -108,8 +108,7 @@ def train(args, logger, writer, device, train_set, valid_set, pre_model, model, 
     best_loss = math.inf; ori_best_loss = math.inf; best_nrmse = math.inf; best_psnr = -math.inf; best_ssim = -math.inf;
     best_epoch_loss = 0; ori_best_epoch_loss = 0; best_epoch_nrmse = 0; best_epoch_psnr = 0; best_epoch_ssim = 0;
 
-    ### shuffle#######################################
-    train_loader = DataLoader(train_set, batch_size = args.BATCH_SIZE, shuffle = False, num_workers = 1, worker_init_fn = seed_worker, generator = g)
+    train_loader = DataLoader(train_set, batch_size = args.BATCH_SIZE, shuffle = True, num_workers = 1, worker_init_fn = seed_worker, generator = g)
     logger.info(f'Num of batches: {len(train_set)}')
     
     start_time = time.time()
@@ -141,13 +140,7 @@ def train(args, logger, writer, device, train_set, valid_set, pre_model, model, 
         ori_neg_nrmse_list = []
         sus_nrmse_list = []
 
-        temp_num = 1
-        
         for train_data in tqdm(train_loader):
-            temp_num += 1
-            if temp_num > 10:
-                break
-                
             pre_model.eval()
             model.train()
             
