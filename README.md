@@ -38,6 +38,6 @@ You can follow the steps below for the inference.
     python test.py
     ```
 ## References
->M. Kim, S. Ji, J. Kim, K. Min, H. Jeong, J. Youn, T. Kim, J. Jang, B. Bilgic, H. Shin, J. Lee, $\chi$-sepnet: Deep neural network for magnetic susceptibility source separation, arXiv prepring, 2024
+>M. Kim, S. Ji, J. Kim, K. Min, H. Jeong, J. Youn, T. Kim, J. Jang, B. Bilgic, H. Shin, J. Lee, $\chi$-sepnet: Deep neural network for magnetic susceptibility source separation, Human Brain Mapping, 2025
 
 >S. Ji, J. Park, H.-G. Shin, J. Youn, M. Kim and J. Lee, Successful generalization for data with higher or lower resolution than training data resolution in deep learning powered QSM reconstruction, ISMRM, 2023
