@@ -1,7 +1,7 @@
 # $\chi$-sepnet (chi-sepnet)
 * The code is for reconstructing susceptibility source-separated maps by deep neural network ($\chi$-sepnet, chi-sepnet).
 * Matlab toolbox including conventional source separation method ($\chi$-separation) is also available (https://github.com/SNU-LIST/chi-separation.git).
-* Pre-trained network (paper ver.) can be run through the toolbox.
+* Pre-trained network (paper ver.) can be run through the toolbox above.
 * The source data for training can be shared to academic institutions. Request should be sent to snu.list.software@gmail.com. For each request, internal approval from our Institutional Review Board (IRB) is required (i.e. takes time).
 * Don't hesitate to contact for usage and bugs: minjoony@snu.ac.kr
 * Last update : Nov 11, 2024
